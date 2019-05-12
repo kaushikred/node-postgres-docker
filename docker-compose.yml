@@ -1,15 +1,17 @@
-version: "3.3"
-services:   
+version: '3.3'
+services:
   db:
     image: postgres
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=practicedocker
+      - POSTGRES_USER=${ENV_DB_USERNAME}
+      - POSTGRES_PASSWORD=${ENV_DB_PASSWORD}
+      - POSTGRES_DB=${ENV_DB_NAME}
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ./postgres-data/postgres:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - 5436:5432
+    expose:
+      - '5436'
 
   practice_docker:
     image: practice_docker
@@ -17,6 +19,12 @@ services:
       - db
     ports:
       - 9001:3000
+    environment:
+      - DB_USERNAME=${ENV_DB_USERNAME}
+      - DB_PASSWORD=${ENV_DB_PASSWORD}
+      - DB_HOST=${ENV_DB_HOST}
+      - DB_NAME=${ENV_DB_NAME}
+      - DB_PORT=${ENV_DB_PORT}
     volumes:
       - .:/app
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; npm start'
